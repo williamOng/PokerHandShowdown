@@ -12,14 +12,6 @@ namespace PokerHandEvaluator.Player_Components
             PlayerHand = playerHand;
         }
 
-        private static string testc(string test) =>
-        test switch
-        {
-            "asd" => "asd",
-            _ => "asd"
-
-        };
-
         public string Name { get; private set; }
         public IHand PlayerHand { get; private set; }
     }

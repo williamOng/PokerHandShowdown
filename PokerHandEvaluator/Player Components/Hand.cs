@@ -4,10 +4,11 @@ using System.Text;
 
 namespace PokerHandEvaluator.Player_Components
 {
-    public interface IHand
+    public class Hand : IHand
     {
-        List<ICard> Cards { get; set; }
-        ICard HighestCard { get; }
 
+        public List<ICard> Cards { get; set; }
+
+        public ICard HighestCard => Cards[0];
     }
 }
