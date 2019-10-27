@@ -3,13 +3,20 @@ using PokerHandEvaluator.RulesEngine;
 using System;
 using System.Collections.Generic;
 
-namespace PokerHandEvaluator
+namespace PokerHandEvaluator.IOHandler
 {
-    public static class IOHandler
+    public class IOHandler
     {
 
         private const int minNumberOfPlayers = 2;
-        public static void GameStart()
+        private readonly IConsoleInputs _consoleInputs;
+     
+        public IOHandler(IConsoleInputs consoleInputs)
+        {
+            _consoleInputs = consoleInputs;
+        }
+
+        public void GameStart()
         {
             bool settingUp = true;
             var players = new List<IPlayer>();
@@ -25,8 +32,8 @@ namespace PokerHandEvaluator
                         bool idleUserInput = true;
                         while (idleUserInput)
                         {
-                            char userInput = Console.ReadKey().KeyChar;
-                            if(userInput == 'y' || userInput == 'Y')
+                            char userInput = _consoleInputs.GetContinuePrompt();
+                            if (userInput == 'y' || userInput == 'Y')
                             {
                                 idleUserInput = false;
                             }
@@ -40,30 +47,29 @@ namespace PokerHandEvaluator
                     }
                 }
                 var evaluator = new PlayerHandEvaluator();
-                var winners = evaluator.PromoteWinners(players);
+                var winners = evaluator.GetWinners(players);
                 Console.WriteLine($"Winner(s): ");
                 foreach (var winner in winners)
                 {
                     Console.WriteLine(winner.Name);
                 }
-                Console.ReadKey();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                Console.WriteLine("Error occured when playing");
+                Console.WriteLine($"Error occured when playing {ex}");
                 throw;
             }
 
         }
 
-        private static IPlayer ParseInputForPlayer()
+        public IPlayer ParseInputForPlayer()
         {
             var playerName = ParsePlayerNameInput();
             var hand = ParsePlayerHandInput();
             return new Player(playerName, hand);
         }
 
-        private static IHand ParsePlayerHandInput()
+        public IHand ParsePlayerHandInput()
         {
             var cardsInput = "";
             var cards = new List<ICard>();
@@ -72,7 +78,7 @@ namespace PokerHandEvaluator
             while (string.IsNullOrEmpty(cardsInput) || cards.Count != PlayerHandEvaluator.ValidNumberOfCards)
             {
                 Console.WriteLine($"Please Enter 5 valid cards in the form of Rank-Suit ex) AD (Ace of Diamonds)"); // Input expected will be in the form of AD QD 4S... as shown in the example
-                cardsInput = Console.ReadLine().ToString();
+                cardsInput = _consoleInputs.GetCards();
                 cards = parseCards(cardsInput);
             }
             hand.Cards = cards;
@@ -80,7 +86,7 @@ namespace PokerHandEvaluator
             return hand;
         } 
 
-        public static List<ICard> parseCards(string rawInput)
+        private List<ICard> parseCards(string rawInput)
         {
             var finalOutput = new List<ICard>();
 
@@ -112,7 +118,7 @@ namespace PokerHandEvaluator
                 card.CardSuit = suit;
                 finalOutput.Add(card);
 
-                if (finalOutput.Count > 5)//Only take into account 5 cards
+                if (finalOutput.Count > PlayerHandEvaluator.ValidNumberOfCards)//Only take into account 5 cards
                 {
                     return new List<ICard>();
                 }
@@ -121,13 +127,17 @@ namespace PokerHandEvaluator
             return finalOutput;
         }
 
-        public static Rank parseRank(string rank) => 
+        public static Rank parseRank(string rank) => // C# 8 Syntax
         rank switch
         {
             "a" => Rank.Ace,
             "k" => Rank.King,
             "q" => Rank.Queen,
             "j" => Rank.Jack,
+            "A" => Rank.Ace,
+            "K" => Rank.King,
+            "Q" => Rank.Queen,
+            "J" => Rank.Jack,
             "10" => Rank.Ten,
             "9" => Rank.Nine,
             "8" => Rank.Eight,
@@ -140,23 +150,27 @@ namespace PokerHandEvaluator
             _ => Rank.Invalid
         };
 
-        public static Suit parseSuit(char suit) =>
+        public static Suit parseSuit(char suit) => // C# 8 Syntax
         suit switch
         {
             'd' => Suit.Diamonds,
             'c' => Suit.Clubs,
             's' => Suit.Spades,
             'h' => Suit.Hearts,
+            'D' => Suit.Diamonds,
+            'C' => Suit.Clubs,
+            'S' => Suit.Spades,
+            'H' => Suit.Hearts,
             _ => Suit.InValid
         };
 
-        private static string ParsePlayerNameInput()
+        public string ParsePlayerNameInput()
         {
             string playerNameInput = "";
             while (string.IsNullOrEmpty(playerNameInput))
             {
                 Console.WriteLine("Please Enter A valid Player Name");
-                playerNameInput = Console.ReadLine().ToString();
+                playerNameInput = _consoleInputs.GetName();
             }
             return playerNameInput;
         } 

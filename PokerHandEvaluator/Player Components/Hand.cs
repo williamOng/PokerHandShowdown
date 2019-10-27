@@ -7,9 +7,8 @@ namespace PokerHandEvaluator.Player_Components
 {
     public class Hand : IHand
     {
-
         public List<ICard> Cards { get; set; }
 
-        public ICard HighestCard => Cards.OrderByDescending(i => i.CardRank).First();
+        public ICard HighestCard => Cards?.OrderByDescending(i => i.CardRank).FirstOrDefault();
     }
 }

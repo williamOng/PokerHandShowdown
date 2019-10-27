@@ -10,7 +10,7 @@ namespace PokerHandEvaluator.RulesEngine
     {
         public const int ValidNumberOfCards = 5;
 
-        public IList<IPlayer> PromoteWinners(IList<IPlayer> players)
+        public IList<IPlayer> GetWinners(IList<IPlayer> players)
         {
             bool anyFlushWinners = TryDetermineFlushWinners(players, out var flushWinners);
             if (anyFlushWinners)
@@ -27,7 +27,7 @@ namespace PokerHandEvaluator.RulesEngine
             {
                 return onePairWinners;
             }
-            return DetermineHighestCard(players);
+            return DeterminePlayersWithHighestCard(players);
             
         }
 
@@ -54,7 +54,7 @@ namespace PokerHandEvaluator.RulesEngine
 
         public bool TryDetermineThreeOfAKindWinners(IList<IPlayer> players, out IList<IPlayer> winners) // 3 of the same rank
         {
-            var possibleWinners = GetSameRanks(players, 3);
+            var possibleWinners = GetCardsOfSameRank(players, 3);
             if (possibleWinners.Any())
             {
                 winners = ProcessTies(possibleWinners);
@@ -67,7 +67,7 @@ namespace PokerHandEvaluator.RulesEngine
 
         public bool TryDetermineOnePairWinners(IList<IPlayer> players, out IList<IPlayer> winners) // 2 of the same rank
         {
-            var possibleWinners = GetSameRanks(players, 2);
+            var possibleWinners = GetCardsOfSameRank(players, 2);
             if (possibleWinners.Any())
             {
                 winners = ProcessTies(possibleWinners);
@@ -77,7 +77,7 @@ namespace PokerHandEvaluator.RulesEngine
             return false;
         }
 
-        private IList<IPlayer> GetSameRanks(IList<IPlayer> players, int grouping)
+        private IList<IPlayer> GetCardsOfSameRank(IList<IPlayer> players, int grouping)
         {
             var possibleWinners = new List<IPlayer>();
             var max = 0;
@@ -105,7 +105,7 @@ namespace PokerHandEvaluator.RulesEngine
         }
 
 
-        public IList<IPlayer> DetermineHighestCard(IList<IPlayer> players)
+        public IList<IPlayer> DeterminePlayersWithHighestCard(IList<IPlayer> players)
         {
             var filteredPlayers = new List<IPlayer>();
             var max = 0;
@@ -143,14 +143,14 @@ namespace PokerHandEvaluator.RulesEngine
             {
                 return filteredPlayers;
             }
-            return players;//everyone somehow has the same cards
+            return players;//everyone somehow has the same card ranks
         }
 
         public IList<IPlayer> ProcessTies(IList<IPlayer> players)
         { 
             if (players.Count() >= 2)
             {
-                return DetermineHighestCard(players);
+                return DeterminePlayersWithHighestCard(players);
             }
             else
             {

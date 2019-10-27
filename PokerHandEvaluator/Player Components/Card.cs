@@ -26,43 +26,5 @@ namespace PokerHandEvaluator.Player_Components
             return 0;
         }
 
-        //public static IComparer<ICard> sortRank()
-        //{
-        //    return new SortRank();
-        //}
-
-        public static IComparer<ICard> sortSuit()
-        {
-            return new SortSuit();
-        }
-
-        private class SortSuit : IComparer<ICard>
-        {
-
-            public int Compare(ICard x, ICard y)
-            {
-                if (x.CardSuit > y.CardSuit)
-                    return 1;
-                if (x.CardSuit < y.CardSuit)
-                    return -1;
-                else
-                    return 0;
-            }
-        }
-
-        //private class SortRank : IComparer<ICard>
-        //{
-
-        //    public int Compare(ICard x, ICard y)
-        //    {
-        //        if (x.CardRank > y.CardRank)
-        //            return 1;
-        //        if (x.CardRank < y.CardRank)
-        //            return -1;
-        //        else
-        //            return 0;
-        //    }
-        //}
-
     }
 }
