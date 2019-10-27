@@ -10,7 +10,6 @@ namespace PokerHandEvaluatorTests
     public class PlayerHandEvaluatorTests
     {
         private PlayerHandEvaluator _playerHandEvaluator;
-        //private List<IPlayer> _players;
         [TestInitialize]
         public void Setup()
         {

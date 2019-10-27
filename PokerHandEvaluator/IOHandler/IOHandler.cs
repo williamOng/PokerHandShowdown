@@ -53,6 +53,7 @@ namespace PokerHandEvaluator.IOHandler
                 {
                     Console.WriteLine(winner.Name);
                 }
+                Console.ReadKey();
             }
             catch (Exception ex)
             {

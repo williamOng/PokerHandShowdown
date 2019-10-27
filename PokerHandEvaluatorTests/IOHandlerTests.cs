@@ -25,12 +25,19 @@ namespace PokerHandEvaluatorTests
         }
 
         [TestMethod]
+        public void Parse_Player()
+        {
+            var player = _ioHandler.ParseInputForPlayer();
+            Assert.AreEqual("Will", player.Name);
+        }
+
+        [TestMethod]
         public void Parse_Player_Hand_WithGoodInput()
         {
             var hand = _ioHandler.ParsePlayerHandInput();
             var handComparison = new List<ICard>()
             {
-                new Card{CardRank = Rank.Eight, CardSuit = Suit.Spades},
+                new Card{CardRank = Rank.Ten, CardSuit = Suit.Spades},
                 new Card{CardRank = Rank.Eight, CardSuit = Suit.Diamonds},
                 new Card{CardRank = Rank.Ace, CardSuit = Suit.Diamonds},
                 new Card{CardRank = Rank.Queen, CardSuit = Suit.Diamonds},
@@ -49,9 +56,12 @@ namespace PokerHandEvaluatorTests
         {
             Assert.AreEqual(Rank.Invalid, IOHandler.parseRank("ads"));
             Assert.AreEqual(Rank.Ace, IOHandler.parseRank("a"));
+            Assert.AreEqual(Rank.Ace, IOHandler.parseRank("A"));
             Assert.AreEqual(Rank.King, IOHandler.parseRank("k"));
             Assert.AreEqual(Rank.King, IOHandler.parseRank("K"));
             Assert.AreEqual(Rank.Queen, IOHandler.parseRank("q"));
+            Assert.AreEqual(Rank.Queen, IOHandler.parseRank("Q"));
+            Assert.AreEqual(Rank.Jack, IOHandler.parseRank("j"));
             Assert.AreEqual(Rank.Jack, IOHandler.parseRank("J"));
             Assert.AreEqual(Rank.Ten, IOHandler.parseRank("10"));
             Assert.AreEqual(Rank.Nine, IOHandler.parseRank("9"));
@@ -67,11 +77,15 @@ namespace PokerHandEvaluatorTests
         [TestMethod]
         public void Parse_Suit_With_Multiple_Inputs()
         {
-            Assert.AreEqual(Suit.Clubs, 'C');
-            Assert.AreEqual(Suit.Diamonds, 'D');
-            Assert.AreEqual(Suit.Hearts, 'h');
-            Assert.AreEqual(Suit.InValid, 'b');
-            Assert.AreEqual(Suit.Spades, 's');
+            Assert.AreEqual(Suit.Clubs, IOHandler.parseSuit('C'));
+            Assert.AreEqual(Suit.Clubs, IOHandler.parseSuit('c'));
+            Assert.AreEqual(Suit.Diamonds, IOHandler.parseSuit('D'));
+            Assert.AreEqual(Suit.Diamonds, IOHandler.parseSuit('d'));
+            Assert.AreEqual(Suit.Hearts, IOHandler.parseSuit('H'));
+            Assert.AreEqual(Suit.Hearts, IOHandler.parseSuit('h'));
+            Assert.AreEqual(Suit.InValid, IOHandler.parseSuit('b'));
+            Assert.AreEqual(Suit.Spades, IOHandler.parseSuit('S'));
+            Assert.AreEqual(Suit.Spades, IOHandler.parseSuit('s'));
 
         }
     }
@@ -80,7 +94,7 @@ namespace PokerHandEvaluatorTests
     {
         public string GetCards()
         {
-            return "8S 8D AD QD JH";
+            return "10S 8D AD QD JH";
         }
 
         public char GetContinuePrompt()

@@ -108,9 +108,9 @@ namespace PokerHandEvaluator.RulesEngine
         public IList<IPlayer> DeterminePlayersWithHighestCard(IList<IPlayer> players)
         {
             var filteredPlayers = new List<IPlayer>();
-            var max = 0;
-            for(int i = 0; i < ValidNumberOfCards; i++)//iterate through all cards of all remaining players
+            for (int i = 0; i < ValidNumberOfCards; i++)//iterate through all cards of all remaining players
             {
+                int max;
                 if (filteredPlayers.Count() == 1)
                 {
                     break;
@@ -126,7 +126,7 @@ namespace PokerHandEvaluator.RulesEngine
                     var cards = player.PlayerHand.Cards;
                     cards.Sort();
                     int newMax = (int)cards[i].CardRank;
-                    if(newMax > max)
+                    if (newMax > max)
                     {
                         filteredPlayers.Clear();
                         filteredPlayers.Add(player);
@@ -139,11 +139,7 @@ namespace PokerHandEvaluator.RulesEngine
                     }
                 }
             }
-            if (filteredPlayers.Any())
-            {
-                return filteredPlayers;
-            }
-            return players;//everyone somehow has the same card ranks
+            return filteredPlayers;
         }
 
         public IList<IPlayer> ProcessTies(IList<IPlayer> players)
