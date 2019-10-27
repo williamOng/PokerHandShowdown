@@ -8,44 +8,154 @@ namespace PokerHandEvaluator.RulesEngine
 {
     public class PlayerHandEvaluator : IPlayerHandEvaluator
     {
-        public IPlayer[] PromoteWinner(IList<IPlayer> players)
+        public const int ValidNumberOfCards = 5;
+
+        public IList<IPlayer> PromoteWinners(IList<IPlayer> players)
         {
+            bool anyFlushWinners = TryDetermineFlushWinners(players, out var flushWinners);
+            if (anyFlushWinners)
+            {
+                return flushWinners;
+            }
+            bool anyThreeOfAKindWinners = TryDetermineThreeOfAKindWinners(players, out var threeOfAKindWinners);
+            if (anyThreeOfAKindWinners)
+            {
+                return threeOfAKindWinners;
+            }
+            bool anyOnePairWinners = TryDetermineOnePairWinners(players, out var onePairWinners);
+            if (anyOnePairWinners)
+            {
+                return onePairWinners;
+            }
+            return DetermineHighestCard(players);
+            
+        }
+
+        public bool TryDetermineFlushWinners(IList<IPlayer> players, out IList<IPlayer> winners) // five cards same suit
+        {
+            var possibleWinners = new List<IPlayer>();
             foreach(var player in players)
             {
-                //var players;
+                var suits = player.PlayerHand.Cards.Select(x => x.CardSuit).Distinct();
+                if (suits.Count() == 1)
+                {
+                    possibleWinners.Add(player);
+                }
             }
-            return new IPlayer[3];
-        }
 
-        private bool DetermineFlush(IHand hand)
-        {
-            var suits = hand.Cards.Select(x => x.CardSuit).Distinct();
-            if (suits.Count() == 1)
+            if (possibleWinners.Any())
             {
+                winners = ProcessTies(possibleWinners);
                 return true;
             }
+            winners = null;
             return false;
         }
 
-        private bool DetermineThreeOfAKind(IHand hand)
+        public bool TryDetermineThreeOfAKindWinners(IList<IPlayer> players, out IList<IPlayer> winners) // 3 of the same rank
         {
-            var cards = hand.Cards.GroupBy(card => card.CardRank).Where(group => group.Count() == 3);
-            if (cards.Any())
+            var possibleWinners = GetSameRanks(players, 3);
+            if (possibleWinners.Any())
             {
+                winners = ProcessTies(possibleWinners);
                 return true;
             }
+
+            winners = null;
             return false;
         }
 
-        private bool DetermineOnePair(IHand hand)
+        public bool TryDetermineOnePairWinners(IList<IPlayer> players, out IList<IPlayer> winners) // 2 of the same rank
         {
-            var cards = hand.Cards.GroupBy(card => card.CardSuit).Where(group => group.Count() == 2);
-            if (cards.Any())
+            var possibleWinners = GetSameRanks(players, 2);
+            if (possibleWinners.Any())
             {
+                winners = ProcessTies(possibleWinners);
                 return true;
             }
-            return true;
+            winners = null;
+            return false;
         }
 
+        private IList<IPlayer> GetSameRanks(IList<IPlayer> players, int grouping)
+        {
+            var possibleWinners = new List<IPlayer>();
+            var max = 0;
+            var newMax = 0;
+            foreach (var player in players)
+            {
+                var cardGroups = player.PlayerHand.Cards.GroupBy(card => card.CardRank).Where(group => group.Count() == grouping);
+                var cards = cardGroups.SelectMany(x => x).ToList();
+                cards.Sort(); //Sort here to get the biggest rank as first value for 2 pair
+                if (cards.Any())
+                {
+                    newMax = (int)cards.FirstOrDefault().CardRank;
+                    if (newMax > max)
+                    {
+                        possibleWinners.Clear();
+                        possibleWinners.Add(player);
+                        max = newMax;
+                    }else if(newMax == max)
+                    {
+                        possibleWinners.Add(player);
+                    }
+                }
+            }
+            return possibleWinners;
+        }
+
+
+        public IList<IPlayer> DetermineHighestCard(IList<IPlayer> players)
+        {
+            var filteredPlayers = new List<IPlayer>();
+            var max = 0;
+            for(int i = 0; i < ValidNumberOfCards; i++)//iterate through all cards of all remaining players
+            {
+                if (filteredPlayers.Count() == 1)
+                {
+                    break;
+                }
+                else
+                {
+                    filteredPlayers.Clear();
+                    max = 0;
+                }
+
+                foreach (var player in players)
+                {
+                    var cards = player.PlayerHand.Cards;
+                    cards.Sort();
+                    int newMax = (int)cards[i].CardRank;
+                    if(newMax > max)
+                    {
+                        filteredPlayers.Clear();
+                        filteredPlayers.Add(player);
+                        max = newMax;
+                    }
+                    else if (newMax == max)
+                    {
+                        filteredPlayers.Add(player);
+                        max = newMax;
+                    }
+                }
+            }
+            if (filteredPlayers.Any())
+            {
+                return filteredPlayers;
+            }
+            return players;//everyone somehow has the same cards
+        }
+
+        public IList<IPlayer> ProcessTies(IList<IPlayer> players)
+        { 
+            if (players.Count() >= 2)
+            {
+                return DetermineHighestCard(players);
+            }
+            else
+            {
+                return players;
+            }
+        }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace PokerHandEvaluator.Player_Components
@@ -9,6 +10,6 @@ namespace PokerHandEvaluator.Player_Components
 
         public List<ICard> Cards { get; set; }
 
-        public ICard HighestCard => Cards[0];
+        public ICard HighestCard => Cards.OrderByDescending(i => i.CardRank).First();
     }
 }

@@ -14,5 +14,7 @@ namespace PokerHandEvaluator.Player_Components
 
         public string Name { get; private set; }
         public IHand PlayerHand { get; private set; }
+
+
     }
 }

@@ -7,7 +7,9 @@ namespace PokerHandEvaluator.RulesEngine
 {
     public interface IPlayerHandEvaluator
     {
-        IList<IPlayer> PromoteWinner(IList<IPlayer> players);
+        IList<IPlayer> PromoteWinners(IList<IPlayer> players);
+        IList<IPlayer> ProcessTies(IList<IPlayer> players);
+        IList<IPlayer> DetermineHighestCard(IList<IPlayer> players);
 
     }
 
